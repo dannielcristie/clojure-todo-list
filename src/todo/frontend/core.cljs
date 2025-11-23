@@ -94,7 +94,7 @@
 
 (defn app []
   [:div.todo-app
-   [:h1 "Todo App (Local)"]
+   [:h1 "Todo App"]
    [todo-form]
    [todo-list]])
 
