@@ -109,8 +109,7 @@ A API do backend é acessível na porta `3000`.
 - **Exemplo de Payload:**
   ```json
   {
-    "title": "Minha nova tarefa",
-    "description": "Detalhes da tarefa"
+    "title": "Minha nova tarefa"
   }
   ```
 

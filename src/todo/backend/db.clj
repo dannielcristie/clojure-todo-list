@@ -15,7 +15,6 @@
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
-      description TEXT,
       completed BOOLEAN DEFAULT 0,
       created_at TEXT
     )
@@ -35,10 +34,9 @@
                         :completed 0
                         :created-at (str (java.time.Instant/now)))
         result (jdbc/execute-one! db-spec ["
-          INSERT INTO todos (title, description, completed, created_at)
-          VALUES (?, ?, ?, ?)"
+          INSERT INTO todos (title, completed, created_at)
+          VALUES (?, ?, ?)"
           (:title todo-map)
-          (:description todo-map)
           (:completed todo-map)
           (:created-at todo-map)
           ] {:returning "*"})]
