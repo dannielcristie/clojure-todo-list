@@ -52,6 +52,16 @@
       (catch js/Error e
         (swap! app-state assoc :error (.-message e) :loading false)))))
 
+(defn delete-todo
+  "Chama a API para deletar um todo."
+  [id]
+  (go
+    (try
+      (<p! (js/fetch (str api-url "/todos/" id) (clj->js {:method "DELETE"})))
+      (get-todos)
+      (catch js/Error e
+        (swap! app-state assoc :error (.-message e) :loading false)))))
+
 (defn todo-form []
   [:div.todo-input
    [:input
@@ -80,7 +90,7 @@
         
       (:todos/title todo)
       
-      [:button.delete-btn "X"]
+      [:button.delete-btn {:on-click #(delete-todo (:todos/id todo))} "X"]
       ])])
 
 (defn app []

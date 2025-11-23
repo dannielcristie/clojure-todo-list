@@ -54,3 +54,10 @@
     (if-let [updated-todo (db/toggle-todo! id)]
       {:status 200 :body updated-todo}
       {:status 404 :body {:error "Todo não encontrado"}})))
+
+(defn delete-todo-handler
+  "Handler para deletar um todo."
+  [request]
+  (let [id (-> request :path-params :id Integer/parseInt)]
+    (db/delete-todo! id)
+    {:status 204}))
