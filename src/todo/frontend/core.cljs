@@ -40,6 +40,18 @@
       (catch js/Error e
         (swap! app-state assoc :error (.-message e) :loading false)))))
 
+(defn toggle-todo
+  "Chama a API para alternar o status de um todo."
+  [id]
+  (go
+    (try
+      (<p! (fetch-json (str api-url "/todos/" id "/toggle")
+                       {:method "POST"}))
+      ;; Se funcionou, apenas recarregue a lista inteira
+      (get-todos)
+      (catch js/Error e
+        (swap! app-state assoc :error (.-message e) :loading false)))))
+
 (defn todo-form []
   [:div.todo-input
    [:input
@@ -58,8 +70,18 @@
   [:ul.todo-list
    (for [todo (:todos @app-state)]
      ^{:key (:todos/id todo)}
-     [:li.todo-item
-      (:todos/title todo)])])
+     
+     [:li.todo-item {:class (when (= 1 (:todos/completed todo)) "completed")}
+      
+      [:input.todo-checkbox
+       {:type "checkbox"
+        :checked (not= 0 (:todos/completed todo))
+        :on-change #(toggle-todo (:todos/id todo))}]
+        
+      (:todos/title todo)
+      
+      [:button.delete-btn "X"]
+      ])])
 
 (defn app []
   [:div.todo-app
