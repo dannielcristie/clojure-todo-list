@@ -20,7 +20,8 @@
     ["/todos/:id/toggle"
      {:post {:handler handler/toggle-todo-handler}}]
     ["/todos/:id"
-     {:delete {:handler handler/delete-todo-handler}}]]))
+     {:delete {:handler handler/delete-todo-handler}
+      :put {:handler handler/update-todo-handler}}]]))
 
 (def app
   (ring/ring-handler

@@ -57,3 +57,16 @@
   "Deleta um todo do banco de dados pelo ID."
   [id]
   (jdbc/execute-one! db-spec ["DELETE FROM todos WHERE id = ?" id]))
+
+(defn update-todo!
+  "Atualiza um todo existente no banco de dados."
+  [id updated-data]
+  (jdbc/execute-one! db-spec ["
+    UPDATE todos
+    SET title = ?, completed = ?
+    WHERE id = ?
+    RETURNING *"
+    (:title updated-data)
+    (if (:completed updated-data) 1 0) ;; Converte booleano para 1 ou 0
+    id
+  ]))

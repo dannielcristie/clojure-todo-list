@@ -7,6 +7,8 @@
 
 (defonce app-state (r/atom {:next-id 1
                             :input-text ""
+                            :editing-id nil
+                            :editing-text ""
                             :todos []}))
 
 (def api-url "http://localhost:3000/api")
@@ -61,6 +63,20 @@
       (catch js/Error e
         (swap! app-state assoc :error (.-message e) :loading false)))))
 
+(defn update-todo
+  "Chama a API para atualizar um todo."
+  [id updated-data]
+  (swap! app-state assoc :loading true :error nil)
+  (go
+    (try
+      (<p! (fetch-json (str api-url "/todos/" id)
+                       {:method "PUT"
+                        :headers {"Content-Type" "application/json"}
+                        :body (js/JSON.stringify (clj->js updated-data))}))
+      (get-todos)
+      (catch js/Error e
+        (swap! app-state assoc :error (.-message e) :loading false)))))
+
 (defn todo-form []
   [:div.todo-input
    [:input
@@ -75,22 +91,37 @@
                  (swap! app-state assoc :input-text ""))}
     "Adicionar"]])
 
+(defn todo-item-component [todo]
+  (let [editing? (= (:todos/id todo) (:editing-id @app-state))]
+    [:li.todo-item {:class (when (= 1 (:todos/completed todo)) "completed")}
+     
+     [:input.todo-checkbox
+      {:type "checkbox"
+       :checked (not= 0 (:todos/completed todo))
+       :on-change #(toggle-todo (:todos/id todo))}]
+     
+     (if editing?
+       [:input.edit-input
+        {:type "text"
+         :value (:editing-text @app-state)
+         :on-change #(swap! app-state assoc :editing-text (-> % .-target .-value))
+         :on-blur (fn []
+                    (update-todo (:todos/id todo) {:title (:editing-text @app-state)
+                                                   :completed (not= 0 (:todos/completed todo))})
+                    (swap! app-state assoc :editing-id nil :editing-text ""))
+         :on-key-down (fn [e]
+                        (when (= (.-keyCode e) 13) ; Enter key
+                          (.blur (.-target e))))}]
+       [:span.todo-title {:on-click #(swap! app-state assoc :editing-id (:todos/id todo) :editing-text (:todos/title todo))}
+        (:todos/title todo)])
+     
+     [:button.delete-btn {:on-click #(delete-todo (:todos/id todo))} "X"]]))
+
 (defn todo-list []
   [:ul.todo-list
    (for [todo (:todos @app-state)]
      ^{:key (:todos/id todo)}
-     
-     [:li.todo-item {:class (when (= 1 (:todos/completed todo)) "completed")}
-      
-      [:input.todo-checkbox
-       {:type "checkbox"
-        :checked (not= 0 (:todos/completed todo))
-        :on-change #(toggle-todo (:todos/id todo))}]
-        
-      (:todos/title todo)
-      
-      [:button.delete-btn {:on-click #(delete-todo (:todos/id todo))} "X"]
-      ])])
+     [todo-item-component todo])])
 
 (defn app []
   [:div.todo-app

@@ -43,3 +43,15 @@
   (let [id (-> request :path-params :id Integer/parseInt)]
     (db/delete-todo! id)
     {:status 204}))
+
+(defn update-todo-handler
+  "Handler para atualizar um todo."
+  [request]
+  (let [id (-> request :path-params :id Integer/parseInt)
+        updated-data (:body request)
+        title (:title updated-data)]
+    (if (and title (not (str/blank? title)))
+      (if-let [updated-todo (db/update-todo! id updated-data)]
+        {:status 200 :body updated-todo}
+        {:status 404 :body {:error "Todo não encontrado"}})
+      {:status 400 :body {:error "O 'título' (title) é obrigatório"}})))
