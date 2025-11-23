@@ -5,7 +5,8 @@
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.cors :refer [wrap-cors]]
-            [todo.backend.handler :as handler])
+            [todo.backend.handler :as handler]
+            [todo.backend.db :as db])
   (:gen-class))
 
 ;; --- 1. Definição das Rotas ---
@@ -38,4 +39,5 @@
 ;; --- 4. Ponto de Entrada Principal (-main) ---
 (defn -main [& args]
   (let [port (Integer/parseInt (or (first args) "3000"))]
+    (db/initialize-database!)
     (start-server port)))
