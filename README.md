@@ -47,3 +47,47 @@ Este projeto é containerizado com Docker e é a forma recomendada de executá-l
     ```bash
     docker compose down
     ```
+
+## Backend API Endpoints
+
+A API do backend é acessível na porta `3000`.
+
+### Listar todos os "todos"
+
+- **Método:** `GET`
+- **Path:** `/api/todos`
+- **Exemplo de Resposta:**
+  ```json
+  {
+    "todos": [
+      {
+        "id": 1,
+        "title": "Minha primeira tarefa",
+        "description": null,
+        "completed": 0,
+        "created_at": "..."
+      }
+    ]
+  }
+  ```
+
+### Criar um novo "todo"
+
+- **Método:** `POST`
+- **Path:** `/api/todos`
+- **Exemplo de Payload:**
+  ```json
+  {
+    "title": "Minha nova tarefa",
+    "description": "Detalhes da tarefa"
+  }
+  ```
+
+### Alternar o status de um "todo"
+
+- **Método:** `POST`
+- **Path:** `/api/todos/:id/toggle`
+- **Exemplo de Uso:**
+  ```bash
+  curl -X POST http://localhost:3000/api/todos/1/toggle
+  ```
