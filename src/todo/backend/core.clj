@@ -9,7 +9,6 @@
             [todo.backend.db :as db])
   (:gen-class))
 
-;; --- 1. Definição das Rotas ---
 (def app-routes
   (ring/router
    ["/api"
@@ -23,7 +22,6 @@
     ["/todos/:id"
      {:delete {:handler handler/delete-todo-handler}}]]))
 
-;; --- 2. Definição da Aplicação (App) ---
 (def app
   (ring/ring-handler
    app-routes
@@ -35,12 +33,10 @@
                  wrap-keyword-params
                  wrap-params]}))
 
-;; --- 3. Função para Iniciar o Servidor ---
 (defn start-server [port]
   (println (str "Servidor iniciado na porta " port))
   (jetty/run-jetty #'app {:port port :join? false}))
 
-;; --- 4. Ponto de Entrada Principal (-main) ---
 (defn -main [& args]
   (let [port (Integer/parseInt (or (first args) "3000"))]
     (db/initialize-database!)

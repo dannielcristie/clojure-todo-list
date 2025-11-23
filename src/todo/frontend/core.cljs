@@ -47,7 +47,6 @@
     (try
       (<p! (fetch-json (str api-url "/todos/" id "/toggle")
                        {:method "POST"}))
-      ;; Se funcionou, apenas recarregue a lista inteira
       (get-todos)
       (catch js/Error e
         (swap! app-state assoc :error (.-message e) :loading false)))))
