@@ -100,7 +100,6 @@
    [todo-list]])
 
 (defn ^:export init []
-  (println "Frontend 'Todo Interativo' inicializado...")
   (let [root (rdom/create-root (js/document.getElementById "app"))]
     (.render root (r/as-element [app])))
   (get-todos))

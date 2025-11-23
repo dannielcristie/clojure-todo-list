@@ -31,7 +31,7 @@ Este projeto é containerizado com Docker e é a forma recomendada de executá-l
 1.  **Clone o repositório:**
     ```bash
     git clone <URL do repositório>
-    cd <nome do repositório>
+    cd clojure-todo-list
     ```
 
 2.  **Inicie a aplicação com Docker Compose:**
