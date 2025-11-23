@@ -1,36 +1,31 @@
-# Trabalho em Clojure - Desenvolvimento de um Todo List
+# Clojure - Todo List
 
-## Nome do Aluno
+## Nome do Aluno : Danniel Cristie 
 
-Cristie
+## Descrição
 
-## Link do Tutorial
-
-[https://profsergiocosta.notion.site/Tutorial-Clojure-ClojureScript-Construindo-uma-Aplica-o-Persistente-e-Reativa-2a5cce975093807aa9f0f0cb0cf69645](https://profsergiocosta.notion.site/Tutorial-Clojure-ClojureScript-Construindo-uma-Aplica-o-Persistente-e-Reativa-2a5cce975093807aa9f0f0cb0cf69645)
-
-## Descrição Breve
-
-Este projeto é uma aplicação "Todo List" full-stack desenvolvida com Clojure e ClojureScript, seguindo o tutorial da disciplina de Programação Funcional.
+Este projeto é uma aplicação "Todo List" full-stack desenvolvida com Clojure e ClojureScript.
 
 **Tecnologias:**
-- **Backend:** Clojure, Ring, Reitit, next.jdbc, SQLite
+- **Backend:** Clojure, SQLite
 - **Frontend:** ClojureScript, Reagent, shadow-cljs
 - **Ambiente:** Docker, Docker Compose
 
 ## Como Rodar
 
-Este projeto é containerizado com Docker e é a forma recomendada de executá-lo para evitar problemas de ambiente.
 
-### Pré-requisitos
+### Rodando com Docker
+
+#### Pré-requisitos
 
 - Docker
 - Docker Compose
 
-### Instruções
+#### Instruções
 
 1.  **Clone o repositório:**
     ```bash
-    git clone <URL do repositório>
+    git clone https://github.com/dannielcristie/clojure-todo-list.git
     cd clojure-todo-list
     ```
 
@@ -38,7 +33,7 @@ Este projeto é containerizado com Docker e é a forma recomendada de executá-l
     ```bash
     docker compose up -d
     ```
-    Este comando irá construir a imagem Docker (pode levar alguns minutos na primeira vez) e iniciar os serviços de backend e frontend em background.
+  
 
 3.  **Acesse a aplicação:**
     Abra seu navegador e acesse `http://localhost:8000`.
@@ -47,6 +42,42 @@ Este projeto é containerizado com Docker e é a forma recomendada de executá-l
     ```bash
     docker compose down
     ```
+
+### Rodando Localmente
+
+Para executar o projeto diretamente na sua máquina, você precisará ter o ambiente Clojure e Node.js configurado.
+
+#### Pré-requisitos
+
+- Java JDK (versão 11 ou superior)
+- Clojure CLI
+- Node.js e npm
+
+#### Instruções
+
+1.  **Clone o repositório e instale as dependências:**
+    ```bash
+    git clone https://github.com/dannielcristie/clojure-todo-list.git
+    cd clojure-todo-list
+    npm install
+    ```
+
+2.  **Inicie o servidor de backend:**
+    Em um terminal, execute:
+    ```bash
+    clj -M:run
+    ```
+    O servidor estará rodando na porta `3000`.
+
+3.  **Inicie o servidor de frontend:**
+    Em **outro** terminal, execute:
+    ```bash
+    npx shadow-cljs watch app
+    ```
+    O servidor de desenvolvimento do frontend estará rodando na porta `8000`.
+
+4.  **Acesse a aplicação:**
+    Abra seu navegador e acesse `http://localhost:8000`.
 
 ## Backend API Endpoints
 
@@ -90,4 +121,13 @@ A API do backend é acessível na porta `3000`.
 - **Exemplo de Uso:**
   ```bash
   curl -X POST http://localhost:3000/api/todos/1/toggle
+  ```
+
+### Deletar um "todo"
+
+- **Método:** `DELETE`
+- **Path:** `/api/todos/:id`
+- **Exemplo de Uso:**
+  ```bash
+  curl -X DELETE http://localhost:3000/api/todos/1
   ```
