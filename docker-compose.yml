@@ -9,5 +9,3 @@ services:
       - "9630:9630"
     volumes:
       - .:/app
-    # Keep the container running
-    command: tail -f /dev/null

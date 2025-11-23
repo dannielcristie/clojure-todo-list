@@ -25,6 +25,6 @@ COPY . .
 # Expose the ports for the backend API, frontend dev server, and shadow-cljs REPL
 EXPOSE 3000 8000 9630
 
-# Set a default command to open a shell, allowing for interactive use
-CMD ["/bin/bash"]
+# Set the command to be executed when the container starts
+CMD ["npm", "start"]
 
