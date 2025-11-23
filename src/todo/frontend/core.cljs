@@ -9,6 +9,7 @@
                             :input-text ""
                             :editing-id nil
                             :editing-text ""
+                            :error-message nil
                             :todos []}))
 
 (def api-url "http://localhost:3000/api")
@@ -31,16 +32,20 @@
         (swap! app-state assoc :error (.-message e) :loading false)))))
 
 (defn create-todo [todo-data]
-  (swap! app-state assoc :loading true :error nil)
-  (go
-    (try
-      (<p! (fetch-json (str api-url "/todos")
-                       {:method "POST"
-                        :headers {"Content-Type" "application/json"}
-                        :body (js/JSON.stringify (clj->js todo-data))}))
-      (get-todos)
-      (catch js/Error e
-        (swap! app-state assoc :error (.-message e) :loading false)))))
+  (let [title (:title todo-data)]
+    (if (str/blank? title)
+      (swap! app-state assoc :error-message "O título da tarefa não pode ser vazio.")
+      (do
+        (swap! app-state assoc :loading true :error-message nil)
+        (go
+          (try
+            (<p! (fetch-json (str api-url "/todos")
+                             {:method "POST"
+                              :headers {"Content-Type" "application/json"}
+                              :body (js/JSON.stringify (clj->js todo-data))}))
+            (get-todos)
+            (catch js/Error e
+              (swap! app-state assoc :error (.-message e) :loading false))))))))
 
 (defn toggle-todo
   "Chama a API para alternar o status de um todo."
@@ -78,18 +83,22 @@
         (swap! app-state assoc :error (.-message e) :loading false)))))
 
 (defn todo-form []
-  [:div.todo-input
-   [:input
-    {:type "text"
-     :placeholder "O que precisa ser feito?"
-     :value (:input-text @app-state)
-     :on-change #(swap! app-state assoc :input-text (-> % .-target .-value))}]
+  [:div.todo-input-container
+   [:div.todo-input
+    [:input
+     {:type "text"
+      :placeholder "O que precisa ser feito?"
+      :value (:input-text @app-state)
+      :on-change #(swap! app-state assoc :input-text (-> % .-target .-value) :error-message nil)}]
+    
+    [:button
+     {:on-click (fn []
+                  (create-todo {:title (:input-text @app-state)})
+                  (swap! app-state assoc :input-text ""))}
+     "Adicionar"]]
    
-   [:button
-    {:on-click (fn []
-                 (create-todo {:title (:input-text @app-state)})
-                 (swap! app-state assoc :input-text ""))}
-    "Adicionar"]])
+   (when (:error-message @app-state)
+     [:span.error-message (:error-message @app-state)])])
 
 (defn todo-item-component [todo]
   (let [editing? (= (:todos/id todo) (:editing-id @app-state))]
