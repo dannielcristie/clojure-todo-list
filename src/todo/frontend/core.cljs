@@ -1,28 +1,44 @@
 (ns todo.frontend.core
   (:require [reagent.core :as r]
             [reagent.dom.client :as rdom]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [cljs.core.async :refer [go]]
+            [cljs.core.async.interop :refer-macros [<p!]]))
 
-;; --- 1. Adicione este "Cérebro" Reativo ---
 (defonce app-state (r/atom {:next-id 1
                             :input-text ""
                             :todos []}))
 
-;; --- 2. Adicione esta Lógica de Negócios (Local) ---
-(defn adicionar-todo-local []
-  (swap! app-state
-         (fn [estado-atual]
-           (let [novo-titulo (:input-text estado-atual)
-                 novo-id (:next-id estado-atual)]
-             (if (str/blank? novo-titulo)
-               estado-atual ;; Não faz nada se vazio
-               ;; Retorna um NOVO estado
-               {:next-id (inc novo-id)
-                :input-text "" ;; Limpa o input
-                :todos (conj (:todos estado-atual)
-                             {:id novo-id
-                              :title novo-titulo})}
-               )))))
+(def api-url "http://localhost:3000/api")
+
+(defn fetch-json [url options]
+  (-> (js/fetch url (clj->js options))
+      (.then (fn [response]
+               (when-not (.-ok response)
+                 (throw (js/Error. (str "HTTP error: " (.-status response)))))
+               (.json response)))
+      (.then #(js->clj % :keywordize-keys true))))
+
+(defn get-todos []
+  (swap! app-state assoc :loading true :error nil)
+  (go
+    (try
+      (let [response (<p! (fetch-json (str api-url "/todos") {:method "GET"}))]
+        (swap! app-state assoc :todos (:todos response) :loading false))
+      (catch js/Error e
+        (swap! app-state assoc :error (.-message e) :loading false)))))
+
+(defn create-todo [todo-data]
+  (swap! app-state assoc :loading true :error nil)
+  (go
+    (try
+      (<p! (fetch-json (str api-url "/todos")
+                       {:method "POST"
+                        :headers {"Content-Type" "application/json"}
+                        :body (js/JSON.stringify (clj->js todo-data))}))
+      (get-todos)
+      (catch js/Error e
+        (swap! app-state assoc :error (.-message e) :loading false)))))
 
 (defn todo-form []
   [:div.todo-input
@@ -33,8 +49,10 @@
      :on-change #(swap! app-state assoc :input-text (-> % .-target .-value))}]
    
    [:button
-    {:on-click adicionar-todo-local}
-    "Adicionar (Local)"]])
+    {:on-click (fn []
+                 (create-todo {:title (:input-text @app-state)})
+                 (swap! app-state assoc :input-text ""))}
+    "Adicionar"]])
 
 (defn todo-list []
   [:ul.todo-list
@@ -52,4 +70,5 @@
 (defn ^:export init []
   (println "Frontend 'Todo Interativo' inicializado...")
   (let [root (rdom/create-root (js/document.getElementById "app"))]
-    (.render root (r/as-element [app]))))
+    (.render root (r/as-element [app])))
+  (get-todos))
