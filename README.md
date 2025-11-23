@@ -122,6 +122,24 @@ A API do backend é acessível na porta `3000`.
   curl -X POST http://localhost:3000/api/todos/1/toggle
   ```
 
+### Atualizar um "todo"
+
+- **Método:** `PUT`
+- **Path:** `/api/todos/:id`
+- **Exemplo de Payload:**
+  ```json
+  {
+    "title": "Novo título da tarefa",
+    "completed": true
+  }
+  ```
+- **Exemplo de Uso:**
+  ```bash
+  curl -X PUT http://localhost:3000/api/todos/1 \
+       -H "Content-Type: application/json" \
+       -d '{"title": "Tarefa atualizada", "completed": true}'
+  ```
+
 ### Deletar um "todo"
 
 - **Método:** `DELETE`
