@@ -1,12 +1,28 @@
-version: '3.8'
 services:
-  app:
+  backend:
     build: .
-    image: clojure-todo-list
-    container_name: clojure-todo-list-container
+    image: clojure-todo-list-backend
+    container_name: clojure-todo-list-backend
+    command: npm run start:backend
     ports:
       - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.cpcache
+      - /app/.shadow-cljs
+
+  frontend:
+    build: .
+    image: clojure-todo-list-frontend
+    container_name: clojure-todo-list-frontend
+    command: npm run start:frontend
+    ports:
       - "8000:8000"
       - "9630:9630"
     volumes:
       - .:/app
+      - /app/node_modules
+      - /app/.cpcache
+      - /app/.shadow-cljs
+

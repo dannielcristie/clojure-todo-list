@@ -26,5 +26,5 @@ COPY . .
 EXPOSE 3000 8000 9630
 
 # Set the command to be executed when the container starts
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:backend"]
 
